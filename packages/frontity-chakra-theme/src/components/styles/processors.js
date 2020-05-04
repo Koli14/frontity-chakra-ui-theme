@@ -13,7 +13,7 @@ function makeProcessor(tag, options) {
     test: ({ node }) => node.component === tag,
     processor: ({ node }) => {
       node.component = options.component || node.tag;
-      node.props = { ...options.props(node), ...node.props };
+      node.props = { ...options.props({ node }), ...node.props };
       return node;
     },
     // allow for overriding this processors
@@ -83,7 +83,7 @@ const PostLink = ({ children, href, rel, ...props }) => (
 );
 
 const a = makeProcessor("a", {
-  props: node => node.props,
+  props: ({ node }) => node.props,
   component: PostLink
 });
 
