@@ -1,4 +1,3 @@
-//eslint-disable-next-line
 import React from "react";
 import { Callout, Text, Box, Heading, PseudoBox } from "@chakra-ui/core";
 import Link from "../link";
@@ -11,10 +10,14 @@ import Link from "../link";
 function makeProcessor(tag, options) {
   return {
     name: tag,
-    test: node => node.component === tag,
-    process: node => {
+    test: ({ node }) => node.component === tag,
+    processor: ({ node }) => {
+      const classNames = node.props.className; //save it for later
+      const css = node.props.css; //save it for later
       node.component = options.component;
       node.props = options.props(node);
+      node.props.className = classNames; //Add classNames, to empover Gutenberg editor
+      node.props.css = css; //Add css from Gutenberg, so Editors can style
       return node;
     },
     // allow for overriding this processors
@@ -32,7 +35,7 @@ const blockquote = makeProcessor("blockquote", {
 });
 
 const paragraph = makeProcessor("p", {
-  props: node => {
+  props: ({ node }) => {
     // we don't want to add marginTop if the paragraph is nested in another component
     const hasParent = Boolean(node.parent);
     return {
@@ -84,7 +87,7 @@ const PostLink = ({ children, href, rel, ...props }) => (
 );
 
 const a = makeProcessor("a", {
-  props: node => node.props,
+  props: ({ node }) => node.props,
   component: PostLink
 });
 
